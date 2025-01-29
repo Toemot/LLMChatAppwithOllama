@@ -5,7 +5,7 @@ import "./App.css";
 function App() {
   const [model, setModel] = useState("llama3.2");
   const [query, setQuery] = useState("");
-  const [response, setResponse] = useState("");
+  const [chatHistory, setChatHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -17,7 +17,9 @@ function App() {
         model: model,
         query: query,
       });
-      setResponse(res.data.response);
+      const newMessage = { user: query, response: res.data.response };
+      setChatHistory([...chatHistory, newMessage]);
+      setQuery("");
     } catch (error) {
       setError("Failed to fetch response. Please try again.");
       console.error(error);
@@ -53,8 +55,19 @@ function App() {
       </button>
       {error && <p style={{ color: "red" }}>{error}</p>}
       <div>
-        <h2>Response:</h2>
-        <p>{response}</p>
+        <h2>Chat History:</h2>
+        <div className="chat-history">
+          {chatHistory.map((message, index) => (
+            <div key={index}>
+              <p>
+                <strong>You:</strong> {message.user}
+              </p>
+              <p>
+                <strong>LLM:</strong> {message.response}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
